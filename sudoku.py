@@ -11,17 +11,6 @@ def readints(file):
     '''
     return list(map(int, file.readline().strip()))
 
-
-def invalid(variables, constraints):
-    ''' check if the input sudoku has no error
-    '''
-    for var in variables:
-        for cons in constraints[var]:
-            if len(variables[cons]) == 1 and len(variables[var]) == 1 and variables[cons][0] == variables[var][0]:
-                return True
-    return False
-
-
 def init_from_file(file):
     ''' read sudoku grid from stdin and return its CSP
     '''
@@ -33,8 +22,6 @@ def init_from_file(file):
     # constraints[position] : neq in rows / columns / block
     constraints = {(i, j): [(i2, j2) for i2 in range(9) for j2 in range(9) if (i != i2 or j != j2) and (
         i == i2 or j == j2 or ((i2 // 3 == i // 3) and (j2 // 3 == j // 3)))] for i in range(9) for j in range(9)}
-    if invalid(variables, constraints):
-        return False
     return Csp(variables, constraints)
 
 
@@ -48,11 +35,7 @@ def main():
     parser.add_argument("-s", help="0 : simple backtrack, 1 : backtrack with AC3, MRV, LCV and DH strategies")
     args = parser.parse_args()
     csp = init_from_file(args.i)
-    if csp is not False:
-        csp.print_variables(csp.solve(args.s))
-    else:
-        print("error in sudoku initialisation")
-
+    csp.print_variables(csp.solve(args.s))
 
 if __name__ == '__main__':
     main()

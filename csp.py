@@ -12,27 +12,34 @@ class Csp:
         # {key: [key]}
         self.constraints = constraints
 
+    def invalid(self, assignments):
+        ''' check if the input sudoku has no error
+        '''
+        for var in assignments:
+            for cons in self.constraints[var]:
+                if len(assignments[cons]) == 1 and len(assignments[var]) == 1 and assignments[cons][0] == assignments[var][0]:
+                    return True
+        return False        
+
     def solve(self, strategy):
         ''' backtrack
             - strategy : 0 : backtrack0 || 1 : backtrack
         '''
         assignments = self.variables
-        global nbBacktrack
-        nbBacktrack = 0
-        # reduce domain (since Csp has no init error, it would not fail)
-        if strategy == str(0):
-            print(self.backtrack0.__doc__)
-            b = self.backtrack(assignments, self.unassigned())
-            print("Nb backtrack: ", nbBacktrack)
-            return b
-        elif strategy == str(1):
-            print(self.backtrack.__doc__)
-            self.ac3(assignments)
-            b = self.backtrack(assignments, self.unassigned())
+        if not self.invalid(assignments):
+            global nbBacktrack
+            nbBacktrack = 0
+            if strategy == str(0):
+                print(self.backtrack0.__doc__)
+                b = self.backtrack0(assignments, self.unassigned())
+            else:
+                print(self.backtrack.__doc__)
+                self.ac3(assignments) # reduce domain (since Csp has no init error, it would not fail)
+                b = self.backtrack(assignments, self.unassigned())
             print("Nb backtrack: ", nbBacktrack)
             return b
         else:
-            print("error in strategy, there is no strategy number : ", str(strategy))    
+            print("invalid sudoku grid")
         return None
 
     def print_variables(self, variables):
@@ -138,15 +145,6 @@ class Csp:
                     return backtrack
         return False
 
-    def invalid(self, assignments):
-        ''' check if the input sudoku has no error
-        '''
-        for var in assignments:
-            for cons in self.constraints[var]:
-                if len(assignments[cons]) == 1 and len(assignments[var]) == 1 and assignments[cons][0] == assignments[var][0]:
-                    return True
-        return False
-
     def backtrack0(self, assignments, unassigned):
         ''' backtrack search no heuristic
         '''
@@ -157,12 +155,13 @@ class Csp:
         var = list(unassigned)[0]
         varKey = var
         varValues = unassigned[var]
-        del unassigned[varKey]
+        unassigned_copy = unassigned.copy()
+        del unassigned_copy[varKey]
         for value in varValues:
             assignments_copy = assignments.copy()
             assignments_copy[varKey] = [value]
-            if not self.invalid(assignments_copy):  # AC-3 reduce domains + is_valid
-                backtrack = self.backtrack(assignments, unassigned)
+            if not self.invalid(assignments_copy):
+                backtrack = self.backtrack0(assignments_copy, unassigned_copy)
                 if backtrack is not False:
                     return backtrack
         return False
