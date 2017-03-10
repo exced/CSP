@@ -3,7 +3,6 @@ TARGET=main
 all: $(TARGET)
 
 $(TARGET):
-	python3 main.py <grids/grid1
-	
+	python3 sudoku.py <grids/grid1
 
 clean:
