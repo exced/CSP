@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from sys import *
+import sys
+import argparse
 from csp import Csp
 
 
-def readints():
+def readints(file):
     ''' read integer input as format [x1x2x3x4x5...]
     '''
-    return list(map(int, stdin.readline().strip()))
+    return list(map(int, file.readline().strip()))
 
 
 def invalid(variables, constraints):
@@ -21,10 +22,11 @@ def invalid(variables, constraints):
     return False
 
 
-def init_from_stdin():
+def init_from_file(file):
     ''' read sudoku grid from stdin and return its CSP
     '''
-    grid = [readints() for _ in range(9)]
+    f = open(file, 'r')
+    grid = [readints(f) for _ in range(9)]
     # variables[position] : domain
     variables = {(i, j): (range(1, 10) if grid[i][j] == 0 else [
         grid[i][j]]) for i in range(9) for j in range(9)}
@@ -41,11 +43,16 @@ def main():
         - 81 variables in 9x9 problem with legal values domain
         - 81 variables with 20 constraints -> 1600 constraints (810 different edges)
     '''
-    csp = init_from_stdin()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", help="input file : 9x9 grid")
+    parser.add_argument("-s", help="0 : simple backtrack, 1 : backtrack with AC3, MRV, LCV and DH strategies")
+    args = parser.parse_args()
+    csp = init_from_file(args.i)
     if csp is not False:
-        csp.print_variables(csp.solve())
+        csp.print_variables(csp.solve(args.s))
     else:
         print("error in sudoku initialisation")
+
 
 if __name__ == '__main__':
     main()

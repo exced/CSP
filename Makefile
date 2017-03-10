@@ -3,6 +3,6 @@ TARGET=main
 all: $(TARGET)
 
 $(TARGET):
-	python3 sudoku.py <grids/grid1
+	time python3 sudoku.py -i grids/grid1 -s 1
 
 clean:

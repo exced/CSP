@@ -3,6 +3,7 @@
 
 nbBacktrack = 0
 
+
 class Csp:
 
     def __init__(self, variables, constraints):
@@ -11,14 +12,28 @@ class Csp:
         # {key: [key]}
         self.constraints = constraints
 
-    def solve(self):
+    def solve(self, strategy):
         ''' backtrack
+            - strategy : 0 : backtrack0 || 1 : backtrack
         '''
         assignments = self.variables
-        self.ac3(assignments) # reduce domain (since Csp has no init error, it would not fail)
-        b = self.backtrack(assignments, self.unassigned())
-        print("Nb backtrack: ", nbBacktrack)
-        return b
+        global nbBacktrack
+        nbBacktrack = 0
+        # reduce domain (since Csp has no init error, it would not fail)
+        if strategy == str(0):
+            print(self.backtrack0.__doc__)
+            b = self.backtrack(assignments, self.unassigned())
+            print("Nb backtrack: ", nbBacktrack)
+            return b
+        elif strategy == str(1):
+            print(self.backtrack.__doc__)
+            self.ac3(assignments)
+            b = self.backtrack(assignments, self.unassigned())
+            print("Nb backtrack: ", nbBacktrack)
+            return b
+        else:
+            print("error in strategy, there is no strategy number : ", str(strategy))    
+        return None
 
     def print_variables(self, variables):
         ''' stdout variables of csp
@@ -95,7 +110,7 @@ class Csp:
         while len(queue):
             xi, xj = queue.pop(0)
             if self.remove_inconsistent_values(xi, xj, assignments):
-                if not assignments[xi]: # invalid var
+                if not assignments[xi]:  # invalid var
                     return False
                 queue.extend([(xk, xi) for xk in self.constraints[xi]])
         return True
@@ -110,7 +125,8 @@ class Csp:
         var = self.select_unassigned(unassigned)  # MRV + DH
         varKey = list(var.keys())[0]
         varValues = list(var.values())[0]
-        order_values = self.order_least_constraining(varKey, varValues, assignments, unassigned)  # LCV
+        order_values = self.order_least_constraining(
+            varKey, varValues, assignments, unassigned)  # LCV
         unassigned_copy = unassigned.copy()
         del unassigned_copy[varKey]
         for value in order_values:
@@ -118,6 +134,35 @@ class Csp:
             assignments_copy[varKey] = [value]
             if self.ac3(assignments_copy):  # AC-3 reduce domains + is_valid
                 backtrack = self.backtrack(assignments_copy, unassigned_copy)
+                if backtrack is not False:
+                    return backtrack
+        return False
+
+    def invalid(self, assignments):
+        ''' check if the input sudoku has no error
+        '''
+        for var in assignments:
+            for cons in self.constraints[var]:
+                if len(assignments[cons]) == 1 and len(assignments[var]) == 1 and assignments[cons][0] == assignments[var][0]:
+                    return True
+        return False
+
+    def backtrack0(self, assignments, unassigned):
+        ''' backtrack search no heuristic
+        '''
+        global nbBacktrack
+        nbBacktrack += 1
+        if self.is_complete(assignments):
+            return assignments
+        var = list(unassigned)[0]
+        varKey = var
+        varValues = unassigned[var]
+        del unassigned[varKey]
+        for value in varValues:
+            assignments_copy = assignments.copy()
+            assignments_copy[varKey] = [value]
+            if not self.invalid(assignments_copy):  # AC-3 reduce domains + is_valid
+                backtrack = self.backtrack(assignments, unassigned)
                 if backtrack is not False:
                     return backtrack
         return False
