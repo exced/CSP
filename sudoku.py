@@ -5,14 +5,13 @@ import sys
 import argparse
 from csp import Csp
 
-
 def readints(file):
     ''' read integer input as format [x1x2x3x4x5...]
     '''
     return list(map(int, file.readline().strip()))
 
 def init_from_file(file):
-    ''' read sudoku grid from stdin and return its CSP
+    ''' read sudoku grid from file and return its CSP
     '''
     f = open(file, 'r')
     grid = [readints(f) for _ in range(9)]

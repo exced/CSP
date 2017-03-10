@@ -132,8 +132,7 @@ class Csp:
         var = self.select_unassigned(unassigned)  # MRV + DH
         varKey = list(var.keys())[0]
         varValues = list(var.values())[0]
-        order_values = self.order_least_constraining(
-            varKey, varValues, assignments, unassigned)  # LCV
+        order_values = self.order_least_constraining(varKey, varValues, assignments, unassigned)  # LCV
         unassigned_copy = unassigned.copy()
         del unassigned_copy[varKey]
         for value in order_values:
