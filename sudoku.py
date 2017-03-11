@@ -2,19 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import argparse
 from csp import Csp
 
-def readints(file):
+def readints():
     ''' read integer input as format [x1x2x3x4x5...]
     '''
-    return list(map(int, file.readline().strip()))
+    return list(map(int, sys.stdin.readline().strip()))
 
-def init_from_file(file):
-    ''' read sudoku grid from file and return its CSP
+def init_from_stdin():
+    ''' read sudoku grid from stdin and return its CSP
     '''
-    f = open(file, 'r')
-    grid = [readints(f) for _ in range(9)]
+    grid = [readints() for _ in range(9)]
     # variables[position] : domain
     variables = {(i, j): (range(1, 10) if grid[i][j] == 0 else [
         grid[i][j]]) for i in range(9) for j in range(9)}
@@ -29,12 +27,8 @@ def main():
         - 81 variables in 9x9 problem with legal values domain
         - 81 variables with 20 constraints -> 1600 constraints (810 different edges)
     '''
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", help="input file : 9x9 grid")
-    parser.add_argument("-s", help="0 : simple backtrack, 1 : backtrack with AC3, MRV, LCV and DH strategies")
-    args = parser.parse_args()
-    csp = init_from_file(args.i)
-    csp.print_variables(csp.solve(args.s))
+    csp = init_from_stdin()
+    csp.print_variables(csp.solve())
 
 if __name__ == '__main__':
     main()
