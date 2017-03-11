@@ -13,5 +13,5 @@ python3 sudoku.py <grids/grid1
 
 # Results
 
-![number of backtrack calls](https://github.com/exced/CSP/tree/master/extras/results.png)
+![number of backtrack calls](https://github.com/exced/CSP/blob/master/extras/results.png)
 
