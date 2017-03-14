@@ -29,7 +29,7 @@ class Csp:
             global nbBacktrack
             nbBacktrack = 0
             print(self.backtrack.__doc__)
-            self.ac3(assignments) # reduce domain (since Csp has no init error, it would not fail)
+            self.ac3(assignments) # reduce domain (since Csp has no init error, it should not fail)
             b = self.backtrack(assignments, self.unassigned())
             print("Nb backtrack: ", nbBacktrack)
             return b
